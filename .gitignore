@@ -4,3 +4,6 @@ build/
 .idea/
 
 .DS_Store
+
+*.so.*
+*.a
