@@ -1,6 +1,7 @@
 package net.sileader.cyborg.qb.incubator
 
 import net.sileader.cyborg.appman.ApplicationManager
+import net.sileader.cyborg.core.Basys
 import net.sileader.cyborg.qb.core.exists
 import net.sileader.cyborg.support.annotation.MainThread
 import net.sileader.cyborg.support.annotation.WorkerThread
@@ -25,7 +26,7 @@ class Incubator(val applicationManager: ApplicationManager) {
     constructor(setting: String) : this(JSONObject(setting))
 
     private val mThreadPool= Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()+1)
-    private val mRunning= mutableListOf<Process>()
+    private val mRunning= mutableListOf<Int>()
 
     @MainThread
     fun entry() {
@@ -51,7 +52,9 @@ class Incubator(val applicationManager: ApplicationManager) {
             os.close()
             sock.close()
         }
-        mRunning.filter { it.isAlive }.forEach { it.destroy() }
+        for(pid in mRunning) {
+            Basys.waitPidProcess(pid)
+        }
     }
 
     @WorkerThread
@@ -64,8 +67,16 @@ class Incubator(val applicationManager: ApplicationManager) {
             if(app==null) {
                 Log.e(TAG, "Application not found: $application")
             }else {
-                val pb=ProcessBuilder("java", "Qb", "incubate", "--class-name=${app.name}", "--library-name=${app.library}")
-                mRunning.add(pb.start())
+                val pid=Basys.forkProcess()
+                if(pid==-1) {
+                    Log.e(TAG, "Process cannot create")
+                    return
+                }
+                if(pid==0) {
+                    Incubate.incubate(app, args.toTypedArray())
+                    return
+                }
+                mRunning.add(pid)
             }
         }
     }

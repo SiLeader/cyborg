@@ -26,4 +26,7 @@ class Application(val name: String, val library: String, val className: String, 
 
         return json
     }
+
+    val homeDirectory: String
+    get() = "/cyborg/data/$className"
 }

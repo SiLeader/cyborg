@@ -8,11 +8,10 @@ class Permission(permissions_: List<Int>) {
         const val FORK_PROCESS=1
         const val RUN_AS_ROOT=2
         const val INSTALL_SOFTWARE=3
-        const val WRITE_TO_STORAGE=4
-        const val READ_FROM_STORAGE=5
-        const val IPC=6
+        const val OUTER_DIRECTORY_ACCESS=4
+        const val IPC=5
         const val INTER_PROCESS_COMMUNICATION= IPC
-        const val GRANT_PERMISSION=7
+        const val GRANT_PERMISSION=6
 
     }
 
@@ -23,7 +22,7 @@ class Permission(permissions_: List<Int>) {
     fun grant(p: Int): Boolean {
         if(this has GRANT_PERMISSION) {
             when(p) {
-                INTERNET_ACCESS, FORK_PROCESS, RUN_AS_ROOT, INSTALL_SOFTWARE, WRITE_TO_STORAGE, READ_FROM_STORAGE, IPC
+                INTERNET_ACCESS, FORK_PROCESS, RUN_AS_ROOT, INSTALL_SOFTWARE, OUTER_DIRECTORY_ACCESS, IPC
                 -> mPermissions.add(p)
                 else -> return false
             }
